@@ -24,9 +24,13 @@ if (!BOT_TOKEN) {
 const bot = new Telegraf(BOT_TOKEN);
 const userSessions = new Map();
 
+// Тексты бота и ссылки
+const REGISTRATION_URL = 'https://lkgp.pro/c20ece'; // Замените на вашу реальную ссылку 1win
+
 const botTexts = {
   ru: {
-    welcome: "Зарегистрируйтесь по нашей ссылке и введите ваш Player ID на 1win:\n\nhttps://r1wtvmb.life/v3/3384/binary-options?p=ll2x",
+    welcome: "Зарегистрируйтесь по нашей ссылке и введите ваш Player ID на 1win:",
+    btnRegister: "🔥 Погнали 🔥",
     checking: "Проверяем ваш ID и наличие депозита от $20...",
     notRegistered: "❌ ID не найден. Убедитесь, что зарегистрировались по нашей ссылке и внесли депозит от $20.",
     lowDeposit: (dep) => `⚠ Ваш депозит составляет $${dep}. Для доступа требуется минимальный депозит от $20.`,
@@ -34,7 +38,8 @@ const botTexts = {
     btnApp: "🚀 Открыть Сигналы App"
   },
   en: {
-    welcome: "Register using our link and enter your 1win Player ID:\n\nhttps://r1wtvmb.life/v3/3384/binary-options?p=ll2x",
+    welcome: "Register using our link and enter your 1win Player ID:",
+    btnRegister: "🔥 Let's Go 🔥",
     checking: "Checking your ID and minimum $20 deposit...",
     notRegistered: "❌ ID not found. Make sure you registered via our link and made a deposit.",
     lowDeposit: (dep) => `⚠ Your deposit is $${dep}. Minimum required deposit is $20.`,
@@ -42,6 +47,24 @@ const botTexts = {
     btnApp: "🚀 Open Signals App"
   }
 };
+
+// Функция обработки выбора языка с кнопкой-ссылкой
+function handleLangSelect(ctx, lang) {
+  const userId = ctx.from.id;
+  userSessions.set(userId, { lang: lang, access: false });
+
+  ctx.answerCbQuery();
+
+  const txt = botTexts[lang];
+
+  // Отправляем текст и прикрепляем инлайн-кнопку со ссылкой
+  ctx.reply(
+    txt.welcome,
+    Markup.inlineKeyboard([
+      [Markup.button.url(txt.btnRegister, REGISTRATION_URL)]
+    ])
+  );
+}
 
 bot.start((ctx) => {
   ctx.reply(
