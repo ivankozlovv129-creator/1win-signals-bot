@@ -30,9 +30,8 @@ const userSessions = new Map();
 // Текстовые шаблоны
 const botTexts = {
   ru: {
-    welcome: "Зарегистрируйтесь по нашей ссылке и получите доступ к сигналам:",
+    welcome: "Зарегистрируйтесь по нашей ссылке и получите доступ к сигналам.\n\n📥 **Следующий шаг:** После регистрации внесите депозит от $20 и отправьте сюда ваш **Player ID** с сайта 1win для проверки:",
     btnRegister: "🔥 Погнали 🔥",
-    nextStepMsg: "📥 Теперь введите ваш **Player ID** с сайта 1win для проверки:",
     checking: "Проверяем ваш ID и наличие депозита от $20...",
     notRegistered: "❌ ID не найден. Убедитесь, что зарегистрировались по нашей ссылке и внесли депозит от $20.",
     lowDeposit: (dep) => `⚠ Ваш депозит составляет $${dep}. Для доступа требуется минимальный депозит от $20.`,
@@ -40,9 +39,8 @@ const botTexts = {
     btnApp: "🚀 Открыть Сигналы App"
   },
   en: {
-    welcome: "Register using our link to get access to signals:",
+    welcome: "Register using our link to get access to signals.\n\n📥 **Next step:** After registering, make a deposit of $20+ and send your 1win **Player ID** here for verification:",
     btnRegister: "🔥 Let's Go 🔥",
-    nextStepMsg: "📥 Now enter your **Player ID** from 1win to verify:",
     checking: "Checking your ID and minimum $20 deposit...",
     notRegistered: "❌ ID not found. Make sure you registered via our link and made a deposit.",
     lowDeposit: (dep) => `⚠ Your deposit is $${dep}. Minimum required deposit is $20.`,
@@ -75,34 +73,19 @@ function handleLangSelect(ctx, lang) {
 
   const txt = botTexts[lang];
 
+  // Отправляем сообщение с описанием и кнопкой-ссылкой
   ctx.reply(
     txt.welcome,
-    Markup.inlineKeyboard([
-      [Markup.button.callback(txt.btnRegister, "go_register")]
-    ])
+    {
+      parse_mode: 'Markdown',
+      ...Markup.inlineKeyboard([
+        [Markup.button.url(txt.btnRegister, REGISTRATION_URL)]
+      ])
+    }
   );
 }
 
-// 2. Обработка клика по кнопке "🔥 Погнали 🔥" (Таймер 1 сек)
-bot.action('go_register', (ctx) => {
-  const userId = ctx.from.id;
-  const user = userSessions.get(userId) || { lang: 'ru', access: false };
-  const txt = botTexts[user.lang];
-
-  // Перенаправляем пользователя по ссылке регистрации
-  ctx.answerCbQuery({ url: REGISTRATION_URL });
-
-  // Запускаем таймер на 1 секунду (1000 мс)
-  setTimeout(async () => {
-    try {
-      await ctx.reply(txt.nextStepMsg, { parse_mode: 'Markdown' });
-    } catch (err) {
-      console.error("Ошибка при отправке сообщения через 1 секунду:", err.message);
-    }
-  }, 1000);
-});
-
-// 3. Обработка ввода Player ID
+// 2. Обработка ввода Player ID
 bot.on('text', async (ctx) => {
   const userId = ctx.from.id;
   const user = userSessions.get(userId) || { lang: 'ru', access: false };
