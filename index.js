@@ -2,9 +2,9 @@ const { Telegraf, Markup } = require('telegraf');
 const axios = require('axios');
 
 // Считываем конфигурацию из переменных окружения (Render Environment Variables)
-const BOT_TOKEN = process.env.BOT_TOKEN;;
-const API_URL = process.env.https://onewin-signals-api.onrender.com;       // Ссылка на Python API (например: https://1win-signals-api.onrender.com)
-const WEBAPP_URL = process.env.https://onewin-signals-webapp.onrender.com; // Ссылка на Mini App (например: https://1win-signals-webapp.onrender.com)
+const BOT_TOKEN = process.env.BOT_TOKEN;
+const API_URL = process.env.API_URL;       
+const WEBAPP_URL = process.env.WEBAPP_URL; 
 
 if (!BOT_TOKEN) {
   console.error("ОШИБКА: Переменная BOT_TOKEN не задана!");
