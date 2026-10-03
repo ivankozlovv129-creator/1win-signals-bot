@@ -26,7 +26,7 @@ const userSessions = new Map();
 
 const botTexts = {
   ru: {
-    welcome: "Зарегистрируйтесь по нашей ссылке и введите ваш Player ID на 1win:\n\nhttps://1win.com/?open=register&p=YOUR_PROMO",
+    welcome: "Зарегистрируйтесь по нашей ссылке и введите ваш Player ID на 1win:\n\nhttps://r1wtvmb.life/v3/3384/binary-options?p=ll2x",
     checking: "Проверяем ваш ID и наличие депозита от $20...",
     notRegistered: "❌ ID не найден. Убедитесь, что зарегистрировались по нашей ссылке и внесли депозит от $20.",
     lowDeposit: (dep) => `⚠ Ваш депозит составляет $${dep}. Для доступа требуется минимальный депозит от $20.`,
@@ -34,7 +34,7 @@ const botTexts = {
     btnApp: "🚀 Открыть Сигналы App"
   },
   en: {
-    welcome: "Register using our link and enter your 1win Player ID:\n\nhttps://1win.com/?open=register&p=YOUR_PROMO",
+    welcome: "Register using our link and enter your 1win Player ID:\n\nhttps://r1wtvmb.life/v3/3384/binary-options?p=ll2x",
     checking: "Checking your ID and minimum $20 deposit...",
     notRegistered: "❌ ID not found. Make sure you registered via our link and made a deposit.",
     lowDeposit: (dep) => `⚠ Your deposit is $${dep}. Minimum required deposit is $20.`,
