@@ -122,3 +122,13 @@ bot.launch().then(() => {
 // Корректная остановка процесса на Render
 process.once('SIGINT', () => bot.stop('SIGINT'));
 process.once('SIGTERM', () => bot.stop('SIGTERM'));
+const http = require('http');
+
+// Создаем минимальный HTTP-сервер, чтобы Render видел открытый порт
+const PORT = process.env.PORT || 3000;
+http.createServer((req, res) => {
+  res.writeHead(200, { 'Content-Type': 'text/plain' });
+  res.end('Bot is running!\n');
+}).listen(PORT, () => {
+  console.log(`HTTP-сервер запущен на порту ${PORT}`);
+});
