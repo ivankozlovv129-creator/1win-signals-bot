@@ -2,7 +2,7 @@ const http = require('http');
 const { Telegraf, Markup } = require('telegraf');
 const axios = require('axios');
 
-// 1. Простейший HTTP-сервер для прохождения проверки портов на Render
+// 1. HTTP-сервер для порта Render
 const PORT = process.env.PORT || 3000;
 http.createServer((req, res) => {
   res.writeHead(200, { 'Content-Type': 'text/plain' });
@@ -11,10 +11,13 @@ http.createServer((req, res) => {
   console.log(`HTTP server listening on port ${PORT}`);
 });
 
-// 2. Считывание переменных окружения
+// 2. Переменные окружения
 const BOT_TOKEN = process.env.BOT_TOKEN;
 const API_URL = process.env.API_URL;
 const WEBAPP_URL = process.env.WEBAPP_URL;
+
+// Ссылка на регистрацию 1win
+const REGISTRATION_URL = 'https://lkgp.pro/c20ece'; // Замените YOUR_PROMO на ваш промокод
 
 if (!BOT_TOKEN) {
   console.error("ОШИБКА: Переменная BOT_TOKEN не задана!");
@@ -24,9 +27,7 @@ if (!BOT_TOKEN) {
 const bot = new Telegraf(BOT_TOKEN);
 const userSessions = new Map();
 
-// Тексты бота и ссылки
-const REGISTRATION_URL = 'https://lkgp.pro/c20ece'; // Замените на вашу реальную ссылку 1win
-
+// Тексты бота
 const botTexts = {
   ru: {
     welcome: "Зарегистрируйтесь по нашей ссылке и введите ваш Player ID на 1win:",
@@ -48,24 +49,7 @@ const botTexts = {
   }
 };
 
-// Функция обработки выбора языка с кнопкой-ссылкой
-function handleLangSelect(ctx, lang) {
-  const userId = ctx.from.id;
-  userSessions.set(userId, { lang: lang, access: false });
-
-  ctx.answerCbQuery();
-
-  const txt = botTexts[lang];
-
-  // Отправляем текст и прикрепляем инлайн-кнопку со ссылкой
-  ctx.reply(
-    txt.welcome,
-    Markup.inlineKeyboard([
-      [Markup.button.url(txt.btnRegister, REGISTRATION_URL)]
-    ])
-  );
-}
-
+// Выбор языка
 bot.start((ctx) => {
   ctx.reply(
     "Choose your language / Выберите язык:",
@@ -84,10 +68,21 @@ bot.action('set_lang_en', (ctx) => handleLangSelect(ctx, 'en'));
 function handleLangSelect(ctx, lang) {
   const userId = ctx.from.id;
   userSessions.set(userId, { lang: lang, access: false });
+
   ctx.answerCbQuery();
-  ctx.reply(botTexts[lang].welcome);
+
+  const txt = botTexts[lang];
+
+  // Отправляем текст С КНОПКОЙ-ССЫЛКОЙ
+  ctx.reply(
+    txt.welcome,
+    Markup.inlineKeyboard([
+      [Markup.button.url(txt.btnRegister, REGISTRATION_URL)]
+    ])
+  );
 }
 
+// Проверка Player ID
 bot.on('text', async (ctx) => {
   const userId = ctx.from.id;
   const user = userSessions.get(userId) || { lang: 'ru', access: false };
