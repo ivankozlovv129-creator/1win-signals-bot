@@ -2,7 +2,7 @@ const http = require('http');
 const { Telegraf, Markup } = require('telegraf');
 const axios = require('axios');
 
-// 1. HTTP-сервер для порта Render
+// 1. HTTP-сервер для прохождения проверки портов на Render
 const PORT = process.env.PORT || 3000;
 http.createServer((req, res) => {
   res.writeHead(200, { 'Content-Type': 'text/plain' });
@@ -11,12 +11,12 @@ http.createServer((req, res) => {
   console.log(`HTTP server listening on port ${PORT}`);
 });
 
-// 2. Переменные окружения
+// 2. Считывание переменных окружения
 const BOT_TOKEN = process.env.BOT_TOKEN;
 const API_URL = process.env.API_URL;
 const WEBAPP_URL = process.env.WEBAPP_URL;
 
-// Ссылка на регистрацию 1win
+// Ваша реферальная ссылка на 1win
 const REGISTRATION_URL = 'https://lkgp.pro/c20ece'; // Замените YOUR_PROMO на ваш промокод
 
 if (!BOT_TOKEN) {
@@ -27,11 +27,12 @@ if (!BOT_TOKEN) {
 const bot = new Telegraf(BOT_TOKEN);
 const userSessions = new Map();
 
-// Тексты бота
+// Текстовые шаблоны
 const botTexts = {
   ru: {
-    welcome: "Зарегистрируйтесь по нашей ссылке и введите ваш Player ID на 1win:",
+    welcome: "Зарегистрируйтесь по нашей ссылке и получите доступ к сигналам:",
     btnRegister: "🔥 Погнали 🔥",
+    nextStepMsg: "📥 Теперь введите ваш **Player ID** с сайта 1win для проверки:",
     checking: "Проверяем ваш ID и наличие депозита от $20...",
     notRegistered: "❌ ID не найден. Убедитесь, что зарегистрировались по нашей ссылке и внесли депозит от $20.",
     lowDeposit: (dep) => `⚠ Ваш депозит составляет $${dep}. Для доступа требуется минимальный депозит от $20.`,
@@ -39,8 +40,9 @@ const botTexts = {
     btnApp: "🚀 Открыть Сигналы App"
   },
   en: {
-    welcome: "Register using our link and enter your 1win Player ID:",
+    welcome: "Register using our link to get access to signals:",
     btnRegister: "🔥 Let's Go 🔥",
+    nextStepMsg: "📥 Now enter your **Player ID** from 1win to verify:",
     checking: "Checking your ID and minimum $20 deposit...",
     notRegistered: "❌ ID not found. Make sure you registered via our link and made a deposit.",
     lowDeposit: (dep) => `⚠ Your deposit is $${dep}. Minimum required deposit is $20.`,
@@ -49,7 +51,7 @@ const botTexts = {
   }
 };
 
-// Выбор языка
+// 1. Старт - выбор языка
 bot.start((ctx) => {
   ctx.reply(
     "Choose your language / Выберите язык:",
@@ -73,16 +75,34 @@ function handleLangSelect(ctx, lang) {
 
   const txt = botTexts[lang];
 
-  // Отправляем текст С КНОПКОЙ-ССЫЛКОЙ
   ctx.reply(
     txt.welcome,
     Markup.inlineKeyboard([
-      [Markup.button.url(txt.btnRegister, REGISTRATION_URL)]
+      [Markup.button.callback(txt.btnRegister, "go_register")]
     ])
   );
 }
 
-// Проверка Player ID
+// 2. Обработка клика по кнопке "🔥 Погнали 🔥" (Таймер 1 сек)
+bot.action('go_register', (ctx) => {
+  const userId = ctx.from.id;
+  const user = userSessions.get(userId) || { lang: 'ru', access: false };
+  const txt = botTexts[user.lang];
+
+  // Перенаправляем пользователя по ссылке регистрации
+  ctx.answerCbQuery({ url: REGISTRATION_URL });
+
+  // Запускаем таймер на 1 секунду (1000 мс)
+  setTimeout(async () => {
+    try {
+      await ctx.reply(txt.nextStepMsg, { parse_mode: 'Markdown' });
+    } catch (err) {
+      console.error("Ошибка при отправке сообщения через 1 секунду:", err.message);
+    }
+  }, 1000);
+});
+
+// 3. Обработка ввода Player ID
 bot.on('text', async (ctx) => {
   const userId = ctx.from.id;
   const user = userSessions.get(userId) || { lang: 'ru', access: false };
